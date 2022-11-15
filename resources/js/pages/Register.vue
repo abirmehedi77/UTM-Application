@@ -63,7 +63,7 @@
                             <label :for="id" class="form-label text-secondary">Speciality</label>
                             <div class="mb-content">
                                 <font-awesome-icon icon="fa-solid fa-list-check" class="icon text-secondary"/>
-                                <input type="text" name="speciality" class="input-text text-secondary" :class="className" :id="id" v-model="form.speciality">
+                                <input @input="checkInput" type="text" name="speciality" class="input-text text-secondary" :class="className" :id="id" v-model="form.speciality" placeholder="Student | Doctor">
                             </div>
                         </div>
                         <p :class="className" v-if="statusCode.speciality">{{ statusCode.speciality[0] }}</p>
@@ -80,8 +80,8 @@
                     </div>
                     <div class="text-center"><span>Already a member?</span> <a href="/">Login</a></div><br>
                     <div class="d-grid gap-2">
-                        <button class="btn btn-primary" type="submit">Student Sign up</button>
-                        <button class="btn btn-primary" type="submit">Doctor Sign up</button>
+                        <button ref="btnStudent" class="btn btn-primary disabled" type="submit">Student Sign up</button>
+                        <button ref="btnDoctor" class="btn btn-primary disabled" type="submit">Doctor Sign up</button>
                     </div>
                 </form>
             </div>
@@ -108,6 +108,32 @@ export default {
             about: ''
 
         });
+
+        let btnDoctor = ref(null)
+        let btnStudent = ref(null)
+        // check input student /doctor
+        const checkInput = (e) => {
+            console.log(e)
+            switch (e.target.value) {
+                case 'Doctor':
+                    btnStudent.value.classList.add('disabled')
+                    btnDoctor.value.classList.remove('disabled')
+                    break;
+                case 'Student':
+                    btnStudent.value.classList.remove('disabled')
+                    btnDoctor.value.classList.add('disabled')
+                    break;
+                default:
+                    btnStudent.value.classList.add('disabled')
+                    btnDoctor.value.classList.add('disabled')
+                    break;
+            }
+        }
+
+
+
+        // console.log(form.speciality)
+
         let className = ref('');
         let statusCode = ref('')
         const signup = async() => {
@@ -117,8 +143,14 @@ export default {
                 console.log(res.data.data.user.name)
                 statusCode.value = ''
                 className.value = ''
+                let defaultToken = {
+                    bearerToken : res.data.data.token,
+                    name : res.data.data.user.name,
+                    speciality : res.data.data.user.speciality,
+                    id : res.data.data.user.id
+                }
                 // restoring token name in localstorage
-                store.dispatch('setToken',res.data.data.token)
+                store.dispatch('setToken',defaultToken)
                
                 // push login page by name
                 router.push({ name: 'Login' });
@@ -141,6 +173,9 @@ export default {
             signup,
             statusCode,
             className,
+            checkInput,
+            btnDoctor,
+            btnStudent
         }
 
         
@@ -165,6 +200,9 @@ export default {
         margin: 10px auto;
         padding: 2em;
     }
+    /* input{
+        text-transform: uppercase;
+    } */
     .mb-3 .form-field{
         position: relative;
     }
@@ -211,5 +249,9 @@ export default {
     }
     p{
         margin-left: 50px;
+    }
+    /* disable button */
+    .disabled{
+        pointer-events: none;
     }
 </style>

@@ -10,10 +10,11 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 /* import specific icons */
-import { faAt,faCircleInfo,faFingerprint, faListCheck, faLock, faUser, faUserSecret, faPowerOff, faCircleXmark, faCheckCircle, faSpinner, faBedPulse} from '@fortawesome/free-solid-svg-icons'
+import {faAt,faCircleInfo,faFingerprint, faListCheck, faLock, faUser, faUserSecret, faPowerOff, faCircleXmark, faCheckCircle, faSpinner, faUsers, faBell} from '@fortawesome/free-solid-svg-icons'
 
 /* add icons to the library */
-library.add(faUserSecret,faAt,faLock,faUser,faFingerprint,faListCheck,faCircleInfo, faLock,faPowerOff,faCircleXmark, faCheckCircle,faSpinner)
+library.add(faUserSecret,faAt,faLock,faUser,faFingerprint,faListCheck,faCircleInfo, faLock,faPowerOff,faCircleXmark, faCheckCircle,faSpinner,faUsers,faBell)
+
 
 // vuex components
 import token from './store/index.js'
@@ -26,6 +27,7 @@ const app = createApp({
 
 app
 .component('font-awesome-icon', FontAwesomeIcon)
+// .use($)
 .use(token)
 .use(router)
 .mount('#app')

@@ -6,6 +6,7 @@
                 <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0"></ul>
                 <!-- Unauthenticated -->
                 <div class="d-flex" v-if="$store.getters.getToken == 0">
@@ -19,14 +20,25 @@
                  <!-- authorized -->
                 <div class="user" v-else>
                     <ul class="navbar-nav me-5 mb-2 mb-lg-0">
+                        <a class="nav-link"><router-link :to="{name: 'Request'}"><span class="text-warning">0</span><font-awesome-icon icon="fa-solid fa-bell" /></router-link></a>
                         <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         {{ $store.getters.getTokenName }}
                         <!-- <font-awesome-icon icon="fa-solid fa-power-off" /> -->
                         </a>
+                        
                         <form @submit.prevent="logout">
                             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                                 <button type="submit" class="dropdown-item" >Logout</button>
+                                <button class="dropdown-item">
+                                    <router-link :to="{name : 'Schedule'}" class="nav-link me-4"><span>Schedule</span></router-link>
+                                </button>
+                                <button class="dropdown-item">
+                                    <router-link :to="{name : 'Request'}" class="nav-link me-4"><span>Request</span></router-link>
+                                </button>
+                                <button class="dropdown-item">
+                                    <router-link :to="{name : 'Profile'}" class="nav-link me-4"><span>Profile</span></router-link>
+                                </button>
                             </div>
                         </form>
                     </li>
@@ -35,40 +47,23 @@
                 </div>
             </div>
         </nav>
-        <RouterView v-slot="{ Component }">
+        <RouterView v-slot="{ Component, route }">
             <transition
                 name="fade" 
                 mode="out-in">
-                <component :is="Component"/>
+                <div :key="route.name">
+                    <component :is="Component"/>
+                </div>
             </transition>
         </RouterView>
 </template>
 <script>
-import { useStore } from 'vuex'
-import { useRouter } from 'vue-router'
-// import { reactive, ref } from 'vue'
+    import getLogout from "../composables/getLogout.js";
     export default {
         setup () {
-            const router = useRouter()
-            const store = useStore()
-            let defaultToken = {
-                bearerToken : 0,
-                name : 0
-            }
-             function logout(){
-                store.dispatch('removeToken',defaultToken)
-                router.push({name : "Login"})
-             }
-             return {
-                logout
-             }
-        },
-        
-        mounted() {
-            // this.authenticatedUser()
-        },
-        methods: {
-          
+            // to access function composable
+          const {logout} = getLogout()  
+        return {logout}
         },
     }
 </script>

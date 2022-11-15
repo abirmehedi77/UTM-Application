@@ -2,11 +2,16 @@ import { createRouter, createWebHistory } from 'vue-router'
 // import Navbar from '../navbar/Navbar.vue'
 import Login from '../pages/Login.vue'
 import Register from '../pages/register.vue'
-import User from '../pages/UserPage.vue'
+import Doctor from '../dashboard/Doctor.vue'
+import Student from '../dashboard/Student.vue'
 import store from '../store/index.js'
 import ForgotPassword from '../pages/ForgotPassword.vue'
 import ResetPassword from '../pages/ResetPassword.vue'
 import Success from '../pages/Success.vue'
+import Schedule from '../pages/Schedule.vue'
+import Request from '../pages/Request.vue'
+import Book from '../pages/Book.vue'
+import Profile from '../pages/Profile.vue'
 const routes = [
     {
         path: '/',
@@ -24,15 +29,6 @@ const routes = [
         // meta: {title : 'Register'}
         meta:{
             requiresAuth:false
-        },
-    },
-    {
-        path: '/user',
-        name: 'User',
-        component: User,
-        // meta: {title : 'User'}
-        meta:{
-            requiresAuth:true
         },
     },
     {
@@ -61,6 +57,60 @@ const routes = [
         meta:{
             requiresAuth:false
         },
+    },
+    {
+        path: '/student',
+        name: 'Student',
+        component: Student,
+        // meta: {title : 'User'}
+        meta:{
+            requiresAuth:true
+        },
+    },
+    {
+        path: '/book/:id',
+        name: 'Book',
+        component: Book,
+        // meta: {title : 'User'}
+        meta:{
+            requiresAuth:true
+        },
+    },
+    {
+        path: '/doctor',
+        name: 'Doctor',
+        component: Doctor,
+        // meta: {title : 'User'}
+        meta:{
+            requiresAuth:true
+        },
+    },
+    {
+        path: '/schedule',
+        name: 'Schedule',
+        component: Schedule,
+        // meta: {title : 'User'}
+        meta:{
+            requiresAuth:true
+        },
+    },
+    {
+        path: '/request',
+        name: 'Request',
+        component: Request,
+        // meta: {title : 'User'}
+        meta:{
+            requiresAuth:true
+        },
+    },
+    {
+        path: '/profile',
+        name: 'Profile',
+        component: Profile,
+        // meta: {title : 'User'}
+        meta:{
+            requiresAuth:true
+        },
     }
 
 ];
@@ -79,9 +129,35 @@ router.beforeEach((to, from)=>{
         return { name : 'Login' }     
     }
     if(to.meta.requiresAuth == false && store.getters.getToken != 0){
-        console.log(store.getters.getToken)
-        return { name : 'User' }
+      if(store.getters.getTokenSpeciality == 'Doctor'){
+        return { name : 'Doctor' }
+      }else{
+        return {name : 'Student'}
+      }
     }
+
+    if(to.meta.requiresAuth == false && store.getters.getTokenSpeciality != 0){
+        console.log(store.getters.getTokenSpeciality);
+        switch (store.getters.getTokenSpeciality) {
+            case 'Doctor':
+                return { name : 'Doctor' };
+                break;
+            case 'Student':
+                return { name : 'Student' };
+                break;
+        
+            default:
+                
+                break;
+        }
+       
+    }
+
+    // if(to.meta.requiresAuth && store.getters.getTokenSpeciality != 0 && store.getters.getTokenSpeciality == "Doctor"){
+    //     console.log('doctor')
+    //     return { name : 'Doctor' }; 
+    // }
+   
     
 })
 

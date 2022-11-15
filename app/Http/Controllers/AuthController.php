@@ -2,21 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\User;
 use App\Traits\HttpResponse;
-use Illuminate\Http\Request;
+use App\Models\PasswordReset;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use App\Http\Requests\LoginUserRequest;
 use App\Http\Requests\StoreUserRequest;
-use App\Http\Requests\ForgotPasswordRequest;
 use App\Http\Requests\ResetPasswordRequest;
-use App\Models\PasswordReset;
-use Carbon\Carbon;
-use Illuminate\Auth\Events\Validated;
-use Mockery\Generator\StringManipulation\Pass\Pass;
+use App\Http\Requests\UpdateProfileRequest;
+use App\Http\Requests\ForgotPasswordRequest;
 
 class AuthController extends Controller
 {
@@ -149,4 +147,38 @@ class AuthController extends Controller
         }
         
     }
+
+    public function updateProfile(UpdateProfileRequest $request){
+        $request->validated($request->all());
+        // uncomment this for token
+        $user = User::find($request->id);
+        // return Hash::make($request->password);
+        if($user->email == $request->email && Hash::check($request->current_password, $user->password)){
+            $user->password = Hash::make($request->new_password);
+            $user->name = $request->name;
+            $user->save();
+            return $this->success([
+                'user' => $user,
+                'message'=>'You Successfully Reset your password...',
+                'token' => $user->createToken('Api Token of '.$user->name)->plainTextToken,
+                
+            ]);
+        }else{
+            return $this->error('', 'Check your credentials before submitting!', 401);
+        }
+    }
+
+    // working on delete
+    // public function destroy(User $users)
+    // {
+    //     // $task->delete();
+    //     // return response(null, 204);
+    //     return $users;
+    //     // return $this->isNotAuthorized($users) ? $this->isNotAuthorized($users) :  $users->delete();
+    // }
+    // private function isNotAuthorized($users){
+    //     if(Auth::user()->id !== $users->user_id) {
+    //         return $this->error('', 'you are not Authorized to make this request', 403);
+    //     }
+    // }
 }

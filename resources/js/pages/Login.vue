@@ -65,7 +65,7 @@ export default {
             const headers = {
                 'Accept': 'application/vnd.api+json',
                 'Content-Type': 'application/vnd.api+json',
-                'Authorization': 'Bearer ' + localStorage.getItem('token')
+                'Authorization': 'Bearer ' + store.getters.getToken
                 }
             await axios.post('/api/login',form, {headers})
             .then((res)=>{
@@ -75,19 +75,28 @@ export default {
 
                 let tokenData = {
                     bearerToken : res.data.data.token,
-                    name : res.data.data.user.name
+                    name : res.data.data.user.name,
+                    speciality : res.data.data.user.speciality,
+                    id : res.data.data.user.id,
                 }
 
                 // restoring token in localstorage using vuex
                 store.dispatch('setToken', tokenData)
                 // push login page by name
                 // window.location.reload();
-                router.push({ name: 'User' });
+                // router.push({ name: '' });
+
+                if(tokenData.speciality == 'Doctor'){
+                    router.push({name: "Doctor"});
+                }else{
+                    router.push({name: "Student"});
+                }
+
             })
             //this is a problem after register
             .catch((err)=>{
                 console.log(err.response)
-                console.log(err.response.data.message)
+                // console.log(err.response.data.message)
                 if(err.response.status === 422){
                     console.log('yes')
                     statusCode.value = err.response.data.errors  
