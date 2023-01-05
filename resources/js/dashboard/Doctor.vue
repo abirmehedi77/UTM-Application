@@ -30,10 +30,8 @@
 </div>
 </template>
 <script>
-// import { useRouter } from 'vue-router'
-import $ from 'jquery'
-// import router from '../router';
 import { useStore } from 'vuex'
+import {useRouter, useRoute} from 'vue-router'
     export default {
         setup (){
             
@@ -45,7 +43,10 @@ import { useStore } from 'vuex'
             studentRequests: []
                      
         }    
-    }, 
+    },
+    computed(){
+        // this.loadBookSchedule()
+    },
     mounted(){
         // this.loadTask();
         this.loadBookSchedule()
@@ -54,6 +55,7 @@ import { useStore } from 'vuex'
      methods: {
         loadBookSchedule(){
                 const store = useStore()
+                const router = useRouter()
                 const headers = {
                     'Accept': 'application/vnd.api+json',
                     'Content-Type': 'application/vnd.api+json',
@@ -61,70 +63,18 @@ import { useStore } from 'vuex'
                     }
                    axios.get('/api/bookschedule',{headers})
                     .then((res)=>{
-                    console.log(res)
+                    // console.log(res)
                     this.studentRequests = res.data.data
                     
                     })
 
                     .catch((err)=>{
                     console.log(err)
+                    router.push({ name: "Login"  });
                 })
 
                 // setInterval(this.loadBookSchedule, 3000)
         }
-        
-
-
-        // loadBookSchedule(){
-        //     const store = useStore()
-        //     $.ajax({
-        //         url: '/api/bookschedule',
-        //         method: 'GET',
-        //         dataType: 'JSON',
-        //         headers: {
-        //             'Accept': 'application/vnd.api+json',
-        //             'Content-Type': 'application/vnd.api+json',
-        //             'Authorization': 'Bearer ' + store.getters.getToken
-        //         },
-        //         success:function(res){
-        //             this.studentRequests = res.data
-        //             // console.log(res.data[0].id)
-        //             res.data.forEach(element => {
-        //                $('.row').append(
-                        //    `<div class='col-sm-6 mb-4'>
-                        //         <div class='card'>
-                        //         <div class='card-body p-4'>
-                        //             <div class='user-content'>
-                        //                 <div class="col-2 user-profile p-2">
-                        //                     <i class='fa-solid fa-user' class='fa-4x'></i>
-                        //                 </div>
-                        //                 <div class="col-sm p-2">
-                        //                     <h4 class="card-title">${element.id}</h4>
-                        //                     <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                        //                 </div>
-                        //             </div>
-                        //             <div class="col-md-12 text-end">
-                        //                 <a href="#"><i class="fa-solid fa-circle-check" class="me-4 text-success fa-2x" ></i></a>
-                        //                 <a href="#"><font-awesome-icon icon="fa-solid fa-circle-xmark" class="text-danger fa-2x"/></a>
-                        //             </div>
-                        //         </div>
-                        //         </div>
-                        //     </div>
-        //                    `
-        //                )
-        //           });
-        //         },
-        //         error:function(err){
-        //             console.log(err)
-        //         }
-        //     })
-        // }
-        
-        // setInterval(()=>{
-        //   this.loadSchedule
-        // },3000)
-
-      
               
      },
     }

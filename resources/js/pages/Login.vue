@@ -2,7 +2,7 @@
     <div class="container">
         <div class="row">
             <div class="col-md-6 card">
-                <!-- {{ form }} -->
+                <!-- {{ $store.getters.getToken }} -->
                 <form @submit.prevent="login">
                     <div class="mb-3">
                         <h1 class="text-center">Login</h1>
@@ -13,7 +13,7 @@
                             <label :for="id" class="form-label text-secondary">Email ID</label>
                             <div class="mb-content">
                                 <font-awesome-icon icon="fa-solid fa-at" class="icon text-secondary"/>
-                                <input type="email" name="email" class="input-text text-secondary" :class="className" :id="id" v-model="form.email">
+                                <input type="email" class="input-text text-secondary" :class="className" :id="id" v-model="form.email">
                             </div>
                         </div>
                         <p :class="className" v-if="statusCode.email">{{ statusCode.email[0] }}</p>
@@ -35,6 +35,16 @@
                     <div class="d-grid gap-2">
                         <button class="btn btn-primary" type="submit">Login</button>
                         <div class="text-center"><span>New to BetterHealth? </span><a href="/register"> Sign Up</a></div>
+                    </div>
+                    <br>
+                    
+                    <div class="mb-3 card p-1 bg-dark text-white" v-if="$store.getters.getUpdated == 0">
+                        <h3 class="text-center">Profile Updated, Please login again.</h3>
+                    </div>
+                    <br>
+                    
+                    <div class="mb-3 card p-1 bg-dark text-white" v-if="$store.getters.getUpdated == 1">
+                        <h3 class="text-center">Sad to see you go! All your user data has been deleted.</h3>
                     </div>
                 </form>
             </div>
@@ -65,7 +75,7 @@ export default {
             const headers = {
                 'Accept': 'application/vnd.api+json',
                 'Content-Type': 'application/vnd.api+json',
-                'Authorization': 'Bearer ' + store.getters.getToken
+                'Authorization': 'Bearer ' + store.getters.getToken 
                 }
             await axios.post('/api/login',form, {headers})
             .then((res)=>{
@@ -78,6 +88,9 @@ export default {
                     name : res.data.data.user.name,
                     speciality : res.data.data.user.speciality,
                     id : res.data.data.user.id,
+                    date : store.getters.getTokenDate || 0,
+                    time : store.getters.getTokenTime || 0,
+
                 }
 
                 // restoring token in localstorage using vuex

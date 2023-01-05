@@ -114,19 +114,31 @@ export default {
         // check input student /doctor
         const checkInput = (e) => {
             console.log(e)
-            switch (e.target.value) {
-                case 'Doctor':
-                    btnStudent.value.classList.add('disabled')
-                    btnDoctor.value.classList.remove('disabled')
-                    break;
-                case 'Student':
-                    btnStudent.value.classList.remove('disabled')
-                    btnDoctor.value.classList.add('disabled')
-                    break;
-                default:
-                    btnStudent.value.classList.add('disabled')
-                    btnDoctor.value.classList.add('disabled')
-                    break;
+            // switch (e.target.value) {
+            //     case 'Doctor':
+            //         btnStudent.value.classList.add('disabled')
+            //         btnDoctor.value.classList.remove('disabled')
+            //         break;
+            //     case 'Student':
+            //         btnStudent.value.classList.remove('disabled')
+            //         btnDoctor.value.classList.add('disabled')
+            //         break;
+            //     default:
+            //         btnStudent.value.classList.add('disabled')
+            //         btnDoctor.value.classList.add('disabled')
+            //         break;
+            // }
+
+            // changes
+            if(e.target.value == "Doctor" || e.target.value == "doctor"){
+                btnStudent.value.classList.add('disabled')
+                btnDoctor.value.classList.remove('disabled')
+            }else if(e.target.value == "Student" || e.target.value == "student"){
+                btnStudent.value.classList.remove('disabled')
+                btnDoctor.value.classList.add('disabled')
+            }else{
+                btnStudent.value.classList.remove('disabled')
+                btnDoctor.value.classList.add('disabled')
             }
         }
 

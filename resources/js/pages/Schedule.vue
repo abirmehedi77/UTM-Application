@@ -5,6 +5,7 @@
                 <!-- {{ form }} -->
                 <form @submit.prevent="schedule">
                     <div class="mb-3">
+                        <!-- {{  this.$route.params.id }} -->
                         <h1 class="text-center">Availability</h1>
                     </div>
                     <hr/>
@@ -18,7 +19,7 @@
                         </div>
                         <!-- <p :class="className" v-if="statusCode.email">{{ statusCode.email[0] }}</p> -->
                     </div>
-                    <div class="mb-3">
+                    <!-- <div class="mb-3">
                        <div class="form-field">
                             <label class="form-label text-secondary">End Time</label>
                            <div class="mb-content">
@@ -26,8 +27,8 @@
                                 <input type="time" class="input-text text-secondary" :class="className" v-model="form.end_time">
                            </div>
                        </div>
-                       <!-- <p :class="className" v-if="statusCode.password">{{ statusCode.password[0] }}</p> -->
-                    </div>
+                      
+                    </div> -->
                     <div class="mb-3">
                         <div class="form-field">
                             <label class="form-label text-secondary">Day</label>
@@ -52,20 +53,22 @@
     // import Datepicker from 'vue3-datepicker'
     // import { stat } from 'fs';
     import { reactive, ref } from 'vue'
-    import { useRouter } from 'vue-router'
+    import { useRouter, useRoute } from 'vue-router'
     import {useStore} from 'vuex'
     export default{
         setup(){
             const router = useRouter()
+            const route = useRoute()
             const store = useStore()
             let className = ref('');
             let statusCode = ref('')
             let form = reactive({
                 starting_time: '',
-                end_time: '',
+                // end_time: '',
                 status: 'active',
                 // password_confirmation:'',
                 day: '',
+                // doctor_id : route.params.id
             });
              // set header
             const headers = {
@@ -80,6 +83,7 @@
                 await axios.post('/api/sched',form,{headers})
                 .then((res)=>{
                     console.log(res)
+                    // router.push({name:""});
                 })
 
                 .catch((err)=>{
@@ -90,7 +94,28 @@
             return {
                 schedule,form,className,statusCode
             }
-        }
+        },
+        created(){
+            // console.log('dwadaw')
+        },
+        mounted () {
+            this.checkIfAuthorized()
+        },
+        methods: {
+            checkIfAuthorized(){
+                console.log('dwadaw')
+                const store = useStore()
+                const router = useRouter()
+                if(store.getters.getToken == 0 || store.getters.getToken == undefined){
+                    console.log("not authorized")
+                    router.push({name: "Login"})
+                }else{
+                    console.log(store.getters.getToken)
+                }   
+            }
+        } 
+
+
     }
 </script>
 

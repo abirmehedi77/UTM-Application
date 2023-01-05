@@ -12,6 +12,13 @@ import Schedule from '../pages/Schedule.vue'
 import Request from '../pages/Request.vue'
 import Book from '../pages/Book.vue'
 import Profile from '../pages/Profile.vue'
+import ProfileInfo from '../pages/ProfileInfo.vue'
+import Rating from '../pages/Rating.vue'
+import NotAuthorized from '../pages/NotAuthorized.vue'
+import PopUp from '../pages/PopUp.vue'
+import RequestStatus from '../pages/RequestStatus.vue'
+import Emergency from '../pages/Emergency.vue'
+import EmergencyRequest from '../pages/EmergencyRequest.vue'
 const routes = [
     {
         path: '/',
@@ -68,7 +75,7 @@ const routes = [
         },
     },
     {
-        path: '/book/:id',
+        path: '/book/:id/:time/:date',
         name: 'Book',
         component: Book,
         // meta: {title : 'User'}
@@ -111,7 +118,65 @@ const routes = [
         meta:{
             requiresAuth:true
         },
-    }
+    },
+    {
+        path: '/profile_info/:id',
+        name: 'Profile_Info',
+        component: ProfileInfo,
+        // meta: {title : 'User'}
+        meta:{
+            requiresAuth:true
+        },
+    },
+    {
+        path: '/rating/:id',
+        name: 'Rating',
+        component: Rating,
+        // meta: {title : 'User'}
+        meta:{
+            requiresAuth:true
+        },
+    },
+    {
+        path: '/not-authorized-access',
+        name: 'Access-denied',
+        component: NotAuthorized,
+        meta:{
+            requiresAuth:false
+        },
+    },
+    {
+        path: '/popup',
+        name: 'Popup',
+        component: PopUp,
+        meta:{
+            requiresAuth:false
+        },
+    },
+    {
+        path: '/request-status',
+        name: 'RequestStatus',
+        component: RequestStatus,
+        meta:{
+            requiresAuth:true
+        },
+    },
+    {
+        path: '/emergency',
+        name: 'Emergency',
+        component: Emergency,
+        meta:{
+            requiresAuth:true
+        },
+    },
+    {
+        path: '/emergency-request',
+        name: 'EmergencyRequest',
+        component: EmergencyRequest,
+        meta:{
+            requiresAuth:true
+        },
+    },
 
 ];
 
@@ -120,38 +185,49 @@ const router = createRouter({
     routes
 });
 
+// token
+let defaultToken = {
+    bearerToken : 0,
+    name : 0,
+    speciality : 0,
+}
 
 // redirect user
-router.beforeEach((to, from)=>{
+router.beforeEach(async(to, from,next)=>{
     // auththentication is true and localStorage is not set
-    if(to.meta.requiresAuth && store.getters.getToken == 0){
+    if(to.meta.requiresAuth && store.getters.getToken == 0 || store.getters.getToken == 'undefined'){
         console.log(store.getters.getToken)
-        return { name : 'Login' }     
+        // return { name : 'Login' } 
+        next({name : "Login"})   
+         
+    }else{
+        // next()
+        console.log('resgister')
+        next()
+        // next()
     }
-    if(to.meta.requiresAuth == false && store.getters.getToken != 0){
-      if(store.getters.getTokenSpeciality == 'Doctor'){
-        return { name : 'Doctor' }
-      }else{
-        return {name : 'Student'}
-      }
-    }
-
-    if(to.meta.requiresAuth == false && store.getters.getTokenSpeciality != 0){
-        console.log(store.getters.getTokenSpeciality);
-        switch (store.getters.getTokenSpeciality) {
-            case 'Doctor':
-                return { name : 'Doctor' };
-                break;
-            case 'Student':
-                return { name : 'Student' };
-                break;
+    // // // problem is doctor redirected to a student pages
+    // if(to.meta.requiresAuth == false && store.getters.getToken != 0){
+    //     if(store.getters.getTokenSpeciality == 'Doctor' || store.getters.getTokenSpeciality == 'doctor'){
+    //         // return { name : 'Doctor' }
+    //         console.log('Doctor')
+    //         next({name : "Doctor"})
+    //     }else{
+    //         next()
+    //     }
+    //     if (store.getters.getTokenSpeciality == 'Student' || store.getters.getTokenSpeciality == 'student') {
+    //         console.log('student')
+    //         next({name : "Student"})
+    //         // return { name : 'Student' }
+    //     }else{
+    //         next()
+    //     }
         
-            default:
-                
-                break;
-        }
-       
-    }
+    
+    // }
+     
+    // retunf false after the login attemp
+    
 
     // if(to.meta.requiresAuth && store.getters.getTokenSpeciality != 0 && store.getters.getTokenSpeciality == "Doctor"){
     //     console.log('doctor')

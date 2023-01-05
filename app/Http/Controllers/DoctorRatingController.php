@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Schedule;
 use App\Models\DoctorRating;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Requests\ScheduleRequest;
-use App\Http\Resources\SchedulesResource;
+use App\Http\Requests\DoctorRatingRequest;
+use App\Http\Resources\DoctorRatingResource;
 
-class ScheduleController extends Controller
+class DoctorRatingController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -18,9 +17,8 @@ class ScheduleController extends Controller
      */
     public function index()
     {
-        return SchedulesResource::collection(
-            Schedule::where('user_id',  Auth::user()->id)->get()//get all where login user = user_id
-            // Schedule::all()
+        return DoctorRatingResource::collection(
+            DoctorRating::get()//get all ratings
         );
     }
 
@@ -40,48 +38,40 @@ class ScheduleController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(ScheduleRequest $request)
+    public function store(DoctorRatingRequest $request)
     {
-     
-        // dd($id);
         $request->validated($request->all());
-        $sched = Schedule::create([
-            'user_id' => Auth::user()->id,
-            'starting_time' => $request->starting_time,
-            // 'end_time' => $request->end_time,
-            'day' => $request->day,
-            'status' => 'active',
-        ]);
-
-        // store default ratings
-        DoctorRating::create([
+        $doctorRatings = DoctorRating::create([
             'student_id' => Auth::user()->id,
-            'doctor_id' => Auth::user()->id,//later add id
-            'feedback' => 'There is no ratings available' ,
-            'ratings' => 0
+            'doctor_id' => $request->doctor_id,//later add id
+            'feedback' => $request->feedback,
+            'ratings' => $request->ratings
         ]);
-
-        return new SchedulesResource($sched);
+        return new DoctorRatingResource($doctorRatings);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Schedule  $schedule
+     * @param  \App\Models\DoctorRating  $doctorRating
      * @return \Illuminate\Http\Response
      */
-    public function show(Schedule $schedule)
+    public function show($id)
     {
-        //
+        $doctorRate = DoctorRatingResource::collection(
+            DoctorRating::where('doctor_id',$id)->get()
+        );
+        // $doctorRate = DoctorRating::where('doctor_id',$id)->get();
+        return $doctorRate;
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Schedule  $schedule
+     * @param  \App\Models\DoctorRating  $doctorRating
      * @return \Illuminate\Http\Response
      */
-    public function edit(Schedule $schedule)
+    public function edit(DoctorRating $doctorRating)
     {
         //
     }
@@ -90,10 +80,10 @@ class ScheduleController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Schedule  $schedule
+     * @param  \App\Models\DoctorRating  $doctorRating
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Schedule $schedule)
+    public function update(Request $request, DoctorRating $doctorRating)
     {
         //
     }
@@ -101,10 +91,10 @@ class ScheduleController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Schedule  $schedule
+     * @param  \App\Models\DoctorRating  $doctorRating
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Schedule $schedule)
+    public function destroy(DoctorRating $doctorRating)
     {
         //
     }

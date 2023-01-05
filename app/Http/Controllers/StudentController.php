@@ -6,20 +6,40 @@ use App\Models\User;
 use App\Models\Schedule;
 use Illuminate\Http\Request;
 use App\Http\Resources\SchedulesResource;
+use App\Models\DoctorRating;
+use League\CommonMark\Extension\Attributes\Node\Attributes;
 
 class StudentController extends Controller
 {
-    /**
+    // /**
+    //  * Display a listing of the resource.
+    //  *
+    //  * @return \Illuminate\Http\Response
+    //  */
+    // public function doctor()
+    // {
+
+    // }
+     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
     public function index()
     {
-        return SchedulesResource::collection(
-            Schedule::where('status',  'active')->get()//get all where login user = user_id
-            // Schedule::all()
+       
+        $doctor = Schedule::where('status','active')->get();
+        
+        $ratingsCollection = SchedulesResource::collection(
+            Schedule::where('status','active')
+    
+            ->join('doctor_ratings', 'doctor_id', '=', 'schedules.user_id')
+           
+            ->get()
+        
         );
+
+        return $ratingsCollection;
     }
 
     /**
@@ -51,7 +71,11 @@ class StudentController extends Controller
      */
     public function show($id)
     {
-        //
+        return SchedulesResource::collection(
+            Schedule::where('user_id',  $id)->get()//get all
+            
+            
+        );
     }
 
     /**
