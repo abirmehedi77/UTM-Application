@@ -2,12 +2,15 @@
     <main>
         <div class="container">
             <div class="row">
-                <div class="col-sm-12 bg-light p-2"><h2 class="text-center text-secondary">Emergency Service.</h2></div>
+                <div class="col-sm-12 bg-light p-2"><h2 class="text-center text-primary">Emergency Service.</h2></div>
                     <!-- <label id="prompt">{{ permisionStatus }}</label> -->
                     <!-- {{ positionLat }} -->
                    
                     <div class="col-sm-6 card" id="map"></div>
-                    <div class="col-sm-6 card">
+                    <div class="col-sm-6">
+                        <div class="card">
+                            <img :src="image" alt="" style="height:20em"/>
+                        </div>
                         <form @submit.prevent="emergencyAlert">
                            <div class="mb-4"></div>
                             <div class="mb-3">
@@ -15,7 +18,7 @@
                                     <label class="form-label text-secondary">Description for emergency</label>
                                     <div class="mb-content">
                                         <!-- <font-awesome-icon icon="fa-solid fa-at" class="icon text-secondary"/> -->
-                                        <font-awesome-icon icon="fa-solid fa-truck-medical" class="icon text-secondary" />
+                                        <font-awesome-icon icon="fa-solid fa-truck-medical" class="icon text-primary" />
                                         <textarea cols="40" rows="5" class="input-text" v-model="form.emergency_description"></textarea>
                                     
                                     </div>
@@ -51,6 +54,7 @@
         </div>
     </main>
 </template>
+
 <script>
     import axios from 'axios'
     import { ref,onMounted} from 'vue'
@@ -58,6 +62,7 @@
     import postBookSchedule from '../composables/postBookSchedule.js'
     // import { useRouter, useRoute } from 'vue-router'
     import {useStore} from 'vuex'
+    import images from '../images/emergency.png'
     export default {
         setup(){
             const renderResponse = ref()
@@ -69,6 +74,9 @@
             let renderTiles = ref()
             let positionLat = ref(null)
             let positionLong = ref(null)
+            let accuracy = ref(null)
+            let defaultCircle = ref(null)
+            let circle = ref(null)
             let loc = ref(null)
             let permisionStatus = ref()
             const router = useRouter()
@@ -79,12 +87,17 @@
                 renderAttr = '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                 renderTileUrls = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
                 renderTiles = L.tileLayer(renderTileUrls, {renderAttr})
+                
                 // get user location first also a granted state
                 navigator.geolocation.getCurrentPosition((position)=>{
-                    console.log(position.coords.latitude)
+                    console.log(position.coords)
                     positionLat.value = position.coords.latitude
                     positionLong.value = position.coords.longitude
+                    // accuracy
+                    // accuracy.value = position.coords.accuracy
                     locationCred(positionLat.value,positionLong.value)
+                    clickMap()
+                
                 },(error)=>{
                     console.log(error)
                     permisionStatus.value = 'denied'
@@ -100,7 +113,18 @@
                         permisionStatus.value = status.state
                         if(status.state == "granted"){  
                             renderTiles.addTo(renderMap)
+                            // add circle
+                            circle = L.circle([latitude, longitude], {
+                                            color: 'red',
+                                            fillColor: '#d46675',
+                                            fillOpacity: 0.3    ,
+                                            radius: 100
+                                        })
+                           
                             renderMarker.setLatLng([latitude, longitude])
+                            circle.addTo(renderMap)
+                            // set circle
+                            
                             // ready user location cred to store to db
                             form.latitude = latitude
                             form.longitude = longitude
@@ -110,17 +134,50 @@
                         console.log(error)
                     })
             }
-            
+            // set customize location set
+            const clickMap = () => {
+                // click map
+
+                renderMap.on('click',(e)=>{
+                    console.log(e)
+                    circle.remove()
+                    circle = L.circle([e.latlng.lat, e.latlng.lng], {
+                                            color: 'red',
+                                            fillColor: '#d46675',
+                                            fillOpacity: 0.2    ,
+                                            radius: 100})
+                    
+                    renderMarker.setLatLng([e.latlng.lat, e.latlng.lng])
+                    renderMarker.bindPopup("<h4 class='bg-light text-secondary'><b>I'm right here!.</b>.</h4>").openPopup();
+                    circle.addTo(renderMap)
+
+                    form.latitude = e.latlng.lat
+                    form.longitude = e.latlng.lng
+                })
+            }
             // for send emergency
             const {form, emergencyAlert,msgError,msgSuccess} = postBookSchedule()
             
-            return {form,emergencyAlert,msgError,msgSuccess,locationCred,renderData,renderMap,renderAttr,renderTiles,renderTileUrls,permisionStatus,positionLat,positionLong}
-        }
+            return {clickMap,form,emergencyAlert,msgError,msgSuccess,locationCred,renderData,renderMap,renderAttr,renderTiles,renderTileUrls,permisionStatus,positionLat,positionLong}
+        },
+        data() {
+            return {
+                image:images
+            }
+        },
    }
     
 </script>
 <style scoped>
     /* .col-sm-6{height: 40em;} */
+    /* ::-webkit-scrollbar{
+        display: none;} */
+ .row{
+    overflow-y: auto;
+    /* overflow: hidden; */
+    height: 450px;
+    /* border: 1px solid red; */
+   }
     #map { height: 40em; }
     .emergency-info{
         display: flex;
@@ -165,6 +222,7 @@
     }
     .mb-3 .form-field .mb-content .error{
         border-color: #dd0e29;
+        /* color: #d46675; */
     }
 
     .mb-3 .form-field .input-text:focus

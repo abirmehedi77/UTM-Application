@@ -1,12 +1,16 @@
 <template>
     <div class="container">
         <div class="row">
-            <div class="col-md-6 card">
+            <div class="col-md-6" style="height: 25em;">
+                <!-- <img v-for="(image,index) in images"  :key="index" :src="image" alt="no images found!"> -->
+                <img :src="image" style="height: 25em; width: 100%;">
+            </div>
+            <div class="col-md-6 card" style="box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;">
                 <!-- {{ form }} -->
                 <form @submit.prevent="schedule">
                     <div class="mb-3">
                         <!-- {{  this.$route.params.id }} -->
-                        <h1 class="text-center">Availability</h1>
+                        <h1 class="text-center text-primary">Set Schedule</h1>
                     </div>
                     <hr/>
                     <div class="mb-3">
@@ -55,6 +59,7 @@
     import { reactive, ref } from 'vue'
     import { useRouter, useRoute } from 'vue-router'
     import {useStore} from 'vuex'
+    import images from '../images/schedule-bro.png'
     export default{
         setup(){
             const router = useRouter()
@@ -83,7 +88,7 @@
                 await axios.post('/api/sched',form,{headers})
                 .then((res)=>{
                     console.log(res)
-                    // router.push({name:""});
+                    router.push({name:"Doctor"});
                 })
 
                 .catch((err)=>{
@@ -93,6 +98,11 @@
 
             return {
                 schedule,form,className,statusCode
+            }
+        },
+        data() {
+            return {
+                image: images
             }
         },
         created(){
@@ -120,6 +130,14 @@
 </script>
 
 <style scoped>
+ ::-webkit-scrollbar{
+        display: none;}
+ .row{
+    overflow-y: auto;
+    /* overflow: hidden; */
+    height: 450px;
+    /* border: 1px solid red; */
+   }
     .container .row .card{
         margin: 10px auto;
         padding: 2em;
